@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Is Crime? — Estimation Activity</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0C447C;--blue:#185FA5;--sky:#B5D4F4;--ice:#E6F1FB;
+  --teal:#1D9E75;--mint:#E1F5EE;--amber:#BA7517;--cream:#FFF8EC;
+  --red:#C0392B;--ink:#1a1a1a;--muted:#555;--rule:#dce6f0;--bg:#f7f9fc;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);padding:0 0 60px;}
+
+/* HEADER */
+.page-header{background:var(--navy);padding:28px 32px 24px;position:relative;overflow:hidden;}
+.page-header::after{content:'';position:absolute;right:-40px;top:-40px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04);}
+.header-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sky);margin-bottom:8px;}
+.header-title{font-family:'DM Serif Display',serif;font-size:28px;color:#fff;line-height:1.2;margin-bottom:6px;}
+.header-sub{font-size:14px;color:var(--sky);font-weight:300;}
+
+.container{max-width:880px;margin:0 auto;padding:0 20px;}
+
+/* INSTRUCTION */
+.instruction-card{background:#fff;border:1px solid var(--rule);border-left:4px solid var(--navy);border-radius:0 8px 8px 0;padding:18px 22px;margin:24px 0 20px;}
+.instruction-card p{font-size:14px;color:var(--muted);line-height:1.7;}
+.instruction-card p+p{margin-top:8px;}
+
+/* STEP BADGE */
+.step-badge{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;font-size:12px;font-weight:600;padding:5px 14px 5px 5px;border-radius:999px;margin-bottom:14px;}
+.step-num{background:#fff;color:var(--navy);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+
+/* GRID */
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+@media(max-width:620px){.main-grid{grid-template-columns:1fr;}}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:20px;}
+.card h3{font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--rule);}
+.card.highlight{border-color:var(--teal);border-width:2px;}
+.card h3.real-label{color:var(--teal);}
+
+/* PIE WRAP */
+.pie-wrap{position:relative;width:100%;aspect-ratio:1;max-width:220px;margin:0 auto 14px;}
+canvas.pie{width:100%;height:100%;}
+.pie-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+.pie-total{font-family:'DM Serif Display',serif;font-size:28px;line-height:1;}
+.pie-label{font-size:10px;color:var(--muted);margin-top:3px;}
+.pie-status{font-size:11px;font-weight:600;margin-top:3px;}
+
+/* LEGEND */
+.legend{display:flex;flex-direction:column;gap:5px;}
+.legend-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.legend-pct{margin-left:auto;font-weight:600;color:var(--ink);font-size:12px;}
+
+/* SLIDERS */
+.slider-list{display:flex;flex-direction:column;gap:13px;}
+.slider-row{display:flex;flex-direction:column;gap:4px;}
+.slider-header{display:flex;align-items:center;justify-content:space-between;}
+.slider-name{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;}
+.color-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+.slider-val{font-size:13px;font-weight:600;min-width:36px;text-align:right;}
+.slider-hint{font-size:11px;color:#999;}
+
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.18);cursor:pointer;transition:transform .1s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);}
+input[type=range]:disabled{opacity:.45;cursor:not-allowed;}
+
+.btn-row{display:flex;justify-content:flex-end;margin-top:10px;}
+.reset-btn{background:none;border:1px solid var(--rule);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 16px;border-radius:6px;cursor:pointer;transition:border-color .15s,color .15s;}
+.reset-btn:hover{border-color:var(--navy);color:var(--navy);}
+
+/* WARN */
+.warn-bar{background:#fde8e8;border:1px solid #e8a0a0;border-radius:6px;padding:10px 14px;font-size:13px;color:var(--red);font-weight:500;margin-bottom:14px;display:none;}
+.warn-bar.show{display:block;}
+
+/* SCREENSHOT PROMPT */
+.ss-prompt{display:none;background:#fff;border:2px solid var(--amber);border-radius:10px;padding:22px 24px;margin-bottom:22px;}
+.ss-prompt.show{display:block;animation:rise .35s ease both;}
+@keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.ss-head{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.ss-icon{width:44px;height:44px;background:var(--cream);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.ss-title{font-size:16px;font-weight:600;color:var(--amber);}
+.ss-subtitle{font-size:13px;color:var(--muted);margin-top:2px;}
+.ss-steps{list-style:none;padding:0;margin:0 0 14px;display:flex;flex-direction:column;gap:8px;}
+.ss-steps li{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.5;}
+.ss-n{width:22px;height:22px;background:var(--amber);color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.ss-tip{font-size:13px;color:var(--muted);font-style:italic;background:var(--cream);border-radius:6px;padding:10px 14px;margin-bottom:16px;line-height:1.6;}
+
+/* REVEAL BUTTON */
+.reveal-btn{display:block;width:100%;padding:14px;background:var(--navy);color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;border:none;border-radius:8px;cursor:pointer;letter-spacing:.02em;transition:background .2s,transform .1s;}
+.reveal-btn:hover{background:var(--blue);}
+.reveal-btn:active{transform:scale(.98);}
+.reveal-btn:disabled{background:#aaa;cursor:not-allowed;}
+.reveal-note{font-size:12px;color:var(--muted);text-align:center;margin-top:6px;}
+
+/* COMPARISON */
+#comparison{display:none;}
+#comparison.show{display:block;animation:rise .4s ease both;}
+
+/* PIE SIDE BY SIDE */
+.pies-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+@media(max-width:560px){.pies-grid{grid-template-columns:1fr;}}
+
+/* SURPRISE BOX */
+.surprise{background:var(--ice);border-left:4px solid var(--navy);border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:20px;}
+.surprise-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);margin-bottom:8px;}
+.surprise p{font-size:14px;color:var(--ink);line-height:1.7;margin-bottom:8px;}
+.surprise p:last-child{margin-bottom:0;}
+
+/* DETAIL TABLE */
+.detail-card{background:#fff;border:1px solid var(--rule);border-radius:10px;padding:20px;margin-bottom:20px;}
+.detail-card h3{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+.detail-card .sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+table.dt{width:100%;border-collapse:collapse;font-size:14px;}
+table.dt thead tr{background:var(--ice);}
+table.dt th{padding:10px 12px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--navy);border-bottom:2px solid var(--sky);}
+table.dt td{padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:middle;}
+table.dt tr:last-child td{border-bottom:none;}
+table.dt tr:nth-child(even) td{background:#fafcff;}
+.cpill{display:inline-flex;align-items:center;gap:6px;font-weight:500;}
+.bw{display:flex;align-items:center;gap:8px;}
+.bt{flex:1;height:8px;background:var(--rule);border-radius:4px;overflow:hidden;}
+.bf{height:100%;border-radius:4px;}
+.bn{font-weight:600;font-size:13px;min-width:34px;text-align:right;}
+.dp{font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap;}
+.dp-over{background:#fde8e8;color:#c0392b;}
+.dp-under{background:#e8f4fd;color:#185FA5;}
+.dp-close{background:#e8f7f0;color:#1D9E75;}
+
+/* SOURCE */
+.source{font-size:12px;color:var(--muted);line-height:1.6;background:var(--ice);border-radius:6px;padding:12px 16px;margin-bottom:20px;}
+
+/* REFLECTION */
+.reflect{background:var(--cream);border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:20px 22px;margin-bottom:20px;}
+.reflect h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--amber);margin-bottom:12px;}
+.q{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:10px;display:flex;gap:8px;line-height:1.6;}
+.q::before{content:'→';color:var(--amber);flex-shrink:0;margin-top:2px;}
+.reflect-note{font-size:13px;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px solid #e8d5a0;font-style:italic;line-height:1.6;}
+
+/* ASSIGNMENT BOX */
+.assign-box{background:#fff;border:2px solid var(--teal);border-radius:10px;padding:20px 22px;margin-bottom:20px;}
+.assign-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.assign-icon{width:36px;height:36px;background:var(--mint);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.assign-title{font-size:15px;font-weight:600;color:var(--teal);}
+.assign-box p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:8px;}
+.assign-box p:last-child{margin-bottom:0;}
+.assign-box strong{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="container">
+    <p class="header-label">CRJU 1000 · Module 1 · Interactive Handout</p>
+    <h1 class="header-title">What Is Crime?</h1>
+    <p class="header-sub">Estimation &amp; reveal activity &nbsp;·&nbsp; SLO 1 &nbsp;·&nbsp; Week 1</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="instruction-card">
+    <p><strong>Before we look at real crime data, let's test your instincts.</strong> Use the sliders to estimate what percentage of all reported crime in the U.S. falls into each of five categories. Your estimates must total exactly 100%.</p>
+    <p>When your total hits 100%, you will be asked to <strong>take a screenshot</strong> of your estimates before the real data is revealed. That screenshot — along with your written reflections — is what you will submit to the Canvas assignment.</p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-badge"><span class="step-num">1</span>Adjust sliders until your total reaches 100%</div>
+
+  <div class="main-grid">
+    <div class="card">
+      <h3>Your Estimate</h3>
+      <div class="pie-wrap">
+        <canvas class="pie" id="myPie" width="220" height="220"></canvas>
+        <div class="pie-center">
+          <span class="pie-total" id="totalNum">100</span>
+          <span class="pie-label">% total</span>
+          <span class="pie-status" id="totalStatus" style="color:transparent;">—</span>
+        </div>
+      </div>
+      <div class="legend" id="myLegend"></div>
+    </div>
+
+    <div class="card">
+      <h3>Set Your Estimates</h3>
+      <div class="slider-list" id="sliderList"></div>
+      <div class="btn-row"><button class="reset-btn" id="resetBtn">Reset to equal</button></div>
+    </div>
+  </div>
+
+  <div class="warn-bar" id="warnBar">Your estimates add up to <span id="warnTotal"></span>% — adjust the sliders until the total is exactly 100%.</div>
+
+  <!-- STEP 2: SCREENSHOT PROMPT — appears when total = 100 -->
+  <div class="ss-prompt" id="ssPrompt">
+    <div class="ss-head">
+      <div class="ss-icon">📸</div>
+      <div>
+        <div class="ss-title">Step 2 — Take Your Screenshot Now</div>
+        <div class="ss-subtitle">Do this before clicking Reveal. Your screenshot is part of your assignment submission.</div>
+      </div>
+    </div>
+
+    <ul class="ss-steps">
+      <li><span class="ss-n">1</span>Make sure your pie chart above shows the estimates you want to commit to.</li>
+      <li><span class="ss-n">2</span>Take a screenshot that clearly captures <strong>the pie chart and the percentage for each category</strong>.</li>
+      <li><span class="ss-n">3</span>Save your screenshot somewhere easy to find — you will upload it to Canvas.</li>
+    </ul>
+
+    <p class="ss-tip">
+      <strong>Screenshot shortcuts:</strong> &nbsp;
+      Windows: <strong>Win + Shift + S</strong> &nbsp;·&nbsp;
+      Mac: <strong>Cmd + Shift + 4</strong> &nbsp;·&nbsp;
+      Chromebook: <strong>Ctrl + Show Windows</strong> &nbsp;·&nbsp;
+      iPhone/iPad: <strong>Side + Volume Up</strong> &nbsp;·&nbsp;
+      Android: <strong>Power + Volume Down</strong>
+    </p>
+
+    <button class="reveal-btn" id="revealBtn">I've taken my screenshot — Reveal Real Data →</button>
+    <p class="reveal-note">Your sliders will lock after clicking. You won't be able to change your estimates.</p>
+  </div>
+
+  <!-- COMPARISON -->
+  <div id="comparison">
+
+    <div class="step-badge"><span class="step-num">3</span>Compare your estimates to the real data</div>
+
+    <!-- TWO PIES SIDE BY SIDE -->
+    <div class="pies-grid">
+      <div class="card">
+        <h3>Your Estimates</h3>
+        <div class="pie-wrap" style="max-width:200px;">
+          <canvas class="pie" id="frozenPie" width="200" height="200"></canvas>
+          <div class="pie-center">
+            <span class="pie-total" style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--ink);">100</span>
+            <span class="pie-label">%</span>
+          </div>
+        </div>
+        <div class="legend" id="frozenLegend"></div>
+      </div>
+
+      <div class="card highlight">
+        <h3 class="real-label">Real Data — BJS &amp; FBI 2022</h3>
+        <div class="pie-wrap" style="max-width:200px;">
+          <canvas class="pie" id="realPie" width="200" height="200"></canvas>
+          <div class="pie-center">
+            <span class="pie-total" style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--teal);">100</span>
+            <span class="pie-label">%</span>
+          </div>
+        </div>
+        <div class="legend" id="realLegend"></div>
+      </div>
+    </div>
+
+    <!-- SURPRISE CALLOUT -->
+    <div class="surprise">
+      <div class="surprise-label">What most people get wrong</div>
+      <p><strong>Property crime makes up roughly 72% of reported crime in the United States</strong> — yet it rarely leads the news or drives public debate about justice. Violent crime, which accounts for about 16%, receives vastly disproportionate media attention relative to how often it actually occurs.</p>
+      <p>This gap between what the data shows and what the public believes is one of the central tensions in criminal justice. You will return to it in Week 2 when we study how crime is measured, and again when we examine how the media frames crime.</p>
+    </div>
+
+    <!-- DETAIL TABLE -->
+    <div class="detail-card">
+      <h3>Side-by-Side Detail</h3>
+      <p class="sub">Source: Bureau of Justice Statistics, NCVS 2022; FBI Crime Data Explorer 2022. Percentages rounded for instructional use.</p>
+      <table class="dt">
+        <thead>
+          <tr>
+            <th style="width:26%">Category</th>
+            <th style="width:27%">Your estimate</th>
+            <th style="width:27%">Real data</th>
+            <th style="width:20%">Difference</th>
+          </tr>
+        </thead>
+        <tbody id="compareBody"></tbody>
+      </table>
+    </div>
+
+    <div class="source">
+      <strong>Data note:</strong> "Property crime" includes larceny/theft, burglary, motor vehicle theft, and trespassing (NCVS 2022). "Violent crime" includes assault, robbery, rape/sexual assault, and homicide. "Drug offenses" reflect arrest data (UCR 2022) and are not directly comparable to victimization data. "White-collar/fraud" figures are significant undercounts — these crimes are rarely reported or prosecuted through the standard system. "Other" covers all remaining offense categories. Because different data sources measure different slices of crime, no single percentage is definitive — this is itself a key lesson you will explore in Week 2.
+    </div>
+
+    <!-- STEP 4: REFLECTION -->
+    <div class="step-badge"><span class="step-num">4</span>Answer the reflection questions in your Canvas assignment</div>
+
+    <div class="reflect">
+      <h3>Reflection Questions — Submit Your Answers in Canvas</h3>
+      <div class="q">Which category surprised you most? Describe the gap between what you estimated and what the real data showed.</div>
+      <div class="q">Where do you think your pre-activity assumptions came from — news coverage, TV shows, personal experience, or something else?</div>
+      <div class="q">Property crime makes up the largest share of reported crime by far, yet violent crime dominates media coverage. What does that gap suggest about how crime gets communicated to the public?</div>
+      <div class="q">Based on this data, does anything about the criminal justice system's priorities — what gets policed, prosecuted, and punished most — surprise or concern you? Why?</div>
+      <p class="reflect-note">Write 3–5 sentences per question. You will copy your responses into the Canvas assignment submission box, and upload your screenshot as a file attachment. See the assignment page for the full rubric and due date.</p>
+    </div>
+
+    <!-- ASSIGNMENT BOX -->
+    <div class="assign-box">
+      <div class="assign-head">
+        <div class="assign-icon">📋</div>
+        <div class="assign-title">Ready to submit? Go to the Canvas Assignment</div>
+      </div>
+      <p>Find <strong>Week 1 Reflection Assignment: What Is Crime?</strong> in your Canvas module. You will submit two things:</p>
+      <p><strong>1. Your screenshot</strong> — upload it as a file attachment. It should show your pie chart with your estimates, taken before you clicked Reveal.</p>
+      <p><strong>2. Your written responses</strong> — paste your answers to the four reflection questions into the submission text box, or upload them as a document.</p>
+      <p>See the assignment page for the complete instructions, grading criteria, and due date.</p>
+    </div>
+
+  </div><!-- /comparison -->
+
+</div><!-- /container -->
+
+<script>
+(function(){
+
+const CATS = [
+  {label:'Property Crime',      color:'#2E86AB', real:72, hint:'Theft, burglary, vehicle theft, trespassing'},
+  {label:'Violent Crime',       color:'#E84855', real:16, hint:'Assault, robbery, rape/sexual assault, homicide'},
+  {label:'Drug Offenses',       color:'#F4A261', real:6,  hint:'Drug possession and trafficking arrests'},
+  {label:'White-Collar / Fraud',color:'#6A4C93', real:3,  hint:'Fraud, embezzlement, identity theft'},
+  {label:'All Other Offenses',  color:'#43AA8B', real:3,  hint:'Vandalism, weapons, DUI, and more'},
+];
+
+let vals = CATS.map(()=>20);
+let revealed = false;
+let frozenVals = null;
+
+const $ = id => document.getElementById(id);
+
+// contexts
+const myCtx     = $('myPie').getContext('2d');
+const frozenCtx = $('frozenPie').getContext('2d');
+const realCtx   = $('realPie').getContext('2d');
+
+/* BUILD SLIDERS */
+const sliderEls = [];
+CATS.forEach((cat,i)=>{
+  const row  = document.createElement('div'); row.className='slider-row';
+  const hdr  = document.createElement('div'); hdr.className='slider-header';
+  const name = document.createElement('div'); name.className='slider-name';
+  name.innerHTML=`<span class="color-dot" style="background:${cat.color}"></span>${cat.label}`;
+  const valEl = document.createElement('span'); valEl.className='slider-val'; valEl.textContent=vals[i]+'%';
+  hdr.appendChild(name); hdr.appendChild(valEl);
+
+  const sl = document.createElement('input');
+  sl.type='range'; sl.min=0; sl.max=100; sl.step=1; sl.value=vals[i];
+  sl.style.background=track(vals[i],cat.color);
+  sl.addEventListener('input',()=>{
+    if(revealed)return;
+    vals[i]=parseInt(sl.value);
+    valEl.textContent=vals[i]+'%';
+    sl.style.background=track(vals[i],cat.color);
+    update();
+  });
+
+  const hint=document.createElement('div'); hint.className='slider-hint'; hint.textContent=cat.hint;
+  row.appendChild(hdr); row.appendChild(sl); row.appendChild(hint);
+  $('sliderList').appendChild(row);
+  sliderEls.push({sl,valEl});
+});
+
+/* RESET */
+$('resetBtn').addEventListener('click',()=>{
+  if(revealed)return;
+  vals=CATS.map(()=>20);
+  sliderEls.forEach(({sl,valEl},i)=>{
+    sl.value=20; valEl.textContent='20%';
+    sl.style.background=track(20,CATS[i].color);
+  });
+  update();
+});
+
+/* REVEAL */
+$('revealBtn').addEventListener('click',()=>{
+  const tot=vals.reduce((a,b)=>a+b,0);
+  if(tot!==100){ $('warnBar').classList.add('show'); $('warnTotal').textContent=tot; return; }
+  $('warnBar').classList.remove('show');
+  frozenVals=[...vals];
+  revealed=true;
+
+  // lock sliders
+  sliderEls.forEach(({sl})=>{ sl.disabled=true; });
+  $('resetBtn').disabled=true;
+  $('revealBtn').disabled=true;
+  $('revealBtn').textContent='✓ Data Revealed';
+
+  // draw frozen
+  drawDonut(frozenCtx,$('frozenPie'),frozenVals);
+  buildLegend($('frozenLegend'),frozenVals,false);
+
+  // draw real
+  drawDonut(realCtx,$('realPie'),CATS.map(c=>c.real));
+  buildLegend($('realLegend'),CATS.map(c=>c.real),true);
+
+  buildTable();
+
+  const comp=$('comparison');
+  comp.classList.add('show');
+  comp.style.display='block';
+  comp.scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+/* UPDATE */
+function update(){
+  if(revealed)return;
+  const tot=vals.reduce((a,b)=>a+b,0);
+  $('totalNum').textContent=tot;
+  const st=$('totalStatus');
+  const ss=$('ssPrompt');
+
+  if(tot===100){
+    st.textContent='✓ Ready'; st.style.color='#1D9E75';
+    $('warnBar').classList.remove('show');
+    ss.classList.add('show');
+  } else {
+    ss.classList.remove('show');
+    if(tot>100){ st.textContent=`${tot-100} over`; st.style.color='#C0392B'; }
+    else        { st.textContent=`${100-tot} to go`; st.style.color='#BA7517'; }
+  }
+  drawDonut(myCtx,$('myPie'),vals);
+  buildLegend($('myLegend'),vals,false);
+}
+
+/* BUILD LEGEND */
+function buildLegend(el,valArray,isReal){
+  el.innerHTML='';
+  CATS.forEach((cat,i)=>{
+    const row=document.createElement('div'); row.className='legend-row';
+    row.innerHTML=`<span class="legend-dot" style="background:${cat.color}"></span><span>${cat.label}</span><span class="legend-pct" style="${isReal?'color:var(--teal)':''}">${valArray[i]}%</span>`;
+    el.appendChild(row);
+  });
+}
+
+/* BUILD TABLE */
+function buildTable(){
+  const tbody=$('compareBody'); tbody.innerHTML='';
+  CATS.forEach((cat,i)=>{
+    const my=frozenVals[i], real=cat.real, diff=my-real, abs=Math.abs(diff);
+    let cls='dp-close',lbl='≈ on target';
+    if(abs>5&&diff>0){cls='dp-over'; lbl=`+${diff}% over`;}
+    if(abs>5&&diff<0){cls='dp-under'; lbl=`${diff}% under`;}
+    if(abs>0&&abs<=5){cls='dp-close'; lbl=diff>0?`+${diff}%`:`${diff}%`;}
+    if(diff===0){cls='dp-close'; lbl='exact!';}
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><div class="cpill"><span class="color-dot" style="background:${cat.color}"></span>${cat.label}</div></td>
+      <td><div class="bw"><div class="bt"><div class="bf" style="width:${my}%;background:${cat.color};opacity:.45;"></div></div><span class="bn">${my}%</span></div></td>
+      <td><div class="bw"><div class="bt"><div class="bf" style="width:${real}%;background:${cat.color};"></div></div><span class="bn">${real}%</span></div></td>
+      <td><span class="dp ${cls}">${lbl}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* DRAW DONUT */
+function drawDonut(ctx,canvas,valArray){
+  const s=canvas.width, cx=s/2, cy=s/2;
+  const outerR=s*.46, innerR=s*.30;
+  const tot=valArray.reduce((a,b)=>a+b,0)||1;
+  ctx.clearRect(0,0,s,s);
+  let start=-Math.PI/2;
+  CATS.forEach((cat,i)=>{
+    const slice=(valArray[i]/tot)*2*Math.PI;
+    if(slice===0)return;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,outerR,start,start+slice);
+    ctx.closePath();
+    ctx.fillStyle=cat.color; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    start+=slice;
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,innerR,0,2*Math.PI);
+  ctx.fillStyle='#fff'; ctx.fill();
+}
+
+function track(v,color){
+  return `linear-gradient(to right,${color} 0%,${color} ${v}%,#dce6f0 ${v}%,#dce6f0 100%)`;
+}
+
+update();
+})();
+</script>
+</body>
+</html>
